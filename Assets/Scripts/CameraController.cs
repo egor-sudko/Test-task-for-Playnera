@@ -3,16 +3,18 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private SpriteRenderer backgroundSprite;
+    // класс отвечает за размер и перемещение камеры
+
+    [SerializeField] private SpriteRenderer backgroundSprite;// спрайт фона уровня
     [Space]
-    [SerializeField] private LayerMask movableObjectsLayer;
+    [SerializeField] private LayerMask movableObjectsLayer;// слой объектов для перемещения 
 
     private Vector2 startPosition;
     private float borderX;
 
     private bool canMove;
 
-    private Bounds bounds;
+    private Bounds bounds;// границы фона
 
     private Camera _camera;
 
@@ -22,7 +24,9 @@ public class CameraController : MonoBehaviour
 
         bounds = backgroundSprite.bounds;
 
+        // устанавалием размер камеры в зависимости от фона
         SetCameraSizeToBackgroundSprite();
+        // находим границы фона, чтобы камера не выходила за его пределы
         SetCameraXBorderToBackgroundSprite();
     }
 
@@ -32,16 +36,18 @@ public class CameraController : MonoBehaviour
         {
             startPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
 
+            // смотрим, чтобы не был выбран объект для перемещения. Если выбран, то камеру не двигаем
             RaycastHit2D hit = Physics2D.Raycast(_camera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero,
            Mathf.Infinity, movableObjectsLayer);
 
             if (!hit) canMove = true;
             else canMove = false;
         }
-        else if (Input.GetMouseButton(0) && canMove)
+        else if (Input.GetMouseButton(0) && canMove) // если можно перемещать камеру, то перемещаем
         {
             float posX = _camera.ScreenToWorldPoint(Input.mousePosition).x - startPosition.x;
 
+            // через Clamp ставим границы камеры
             transform.position = new Vector3(Mathf.Clamp(transform.position.x - posX, -borderX, borderX),
                 transform.position.y, transform.position.z);
         }
