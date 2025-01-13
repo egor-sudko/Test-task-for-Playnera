@@ -2,21 +2,22 @@ using UnityEngine;
 
 public class MovableObjectsController : MonoBehaviour
 {
-    // все эти данные лучше вынести в Data файл с настройками игры и подгружать при загрузке уровня. Можно использовать Zenject
-    // для инициализации и т.п.
-    [Header("Layers")]
-    [SerializeField] private LayerMask placeLayer; // слой для проверки, можно ли разместить объект в проверяемом месте
+    // All this data is better to be moved to the Data file with the game settings and loaded when loading the level.
+    // You can use Zenject for initialization, etc.
 
-    private const float defaultConstZValue = -1f; // значение Z по дефолту, чтобы объекты отрисовывались поверх фона 
-    
+    [Header("Layers")]
+    [SerializeField] private LayerMask placeLayer;  // layer to check if an object can be placed in the checked location
+
+    private const float defaultConstZValue = -1f; // default Z value so that objects are drawn on top of the background
+
     private void Awake()
     {
-        InitializeMovableObjects();// инициализируем объекты для перемещения
+        InitializeMovableObjects();// initialize objects for movement
     }
 
     private void InitializeMovableObjects()
     {
-        MovableObject[] movableObjects = transform.GetComponentsInChildren<MovableObject>();// получаем дочерние элементы с нужным скриптом
+        MovableObject[] movableObjects = transform.GetComponentsInChildren<MovableObject>(); // get child elements with the required script
 
         foreach (var movableObj in movableObjects)
         {

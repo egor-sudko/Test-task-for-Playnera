@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class MovableObject : MonoBehaviour
 {
-    // класс с логикой работы объекта для перемещения
+    // class with logic of the object operation for moving
 
     private bool isDrag;
     private Vector3 offset;
@@ -16,7 +16,7 @@ public class MovableObject : MonoBehaviour
     private Camera _camera;
     private Rigidbody2D _rb;
 
-    public void Initialize(LayerMask placeLayer, float defaultPositionZ)// инициализируем объект
+    public void Initialize(LayerMask placeLayer, float defaultPositionZ)// initialize the object
     {
         this.placeLayer = placeLayer;
         this.defaultPositionZ = defaultPositionZ;
@@ -26,57 +26,60 @@ public class MovableObject : MonoBehaviour
         _camera = Camera.main;
         _rb = GetComponent<Rigidbody2D>();
 
-        // т.к. в ТЗ указывалось, что нужно чтобы предметы падали с физикой, то добавили твердое тело.
-        // но я бы лучше использовал анимацию перемещения вместо физики, т.к. в игре референсе используется именно она
-        // + там идет проверка на ближайшие объекты, к которым можно подлететь и занять место, а не просто упасть вниз пока не станем на что-то
+        /* since the technical specifications stated that objects should fall with physics, a rigid body was added.
+         * But I would rather use movement animation instead of physics, since it is used in the reference game.
+         * There is also a check for nearby objects that you can fly up to and take a place, and not just fall down until you stand on something */
 
-        _rb.freezeRotation = true;// убираем вращения, если не сделали это через инспектор
-        _rb.isKinematic = true;// делаем тело кинематическим для нормального перемещения 
+        _rb.freezeRotation = true;// remove rotations if you haven't done it through the inspector
+        _rb.isKinematic = true;// we make the body kinematic for normal movement
     }
 
     private void Update()
     {
-        if (isDrag)// если можно перемещать объект, то перемещаем
+        if (isDrag)// if it is possible to move an object, then we move it
         {
             transform.position = _camera.ScreenToWorldPoint(Input.mousePosition) + offset;
 
-            // изменение позиции Z с привязкой к Y. Сделано чтобы создать эффет "глубины" на 2D сцене
-            // Чем выше Y, тем дальше по Z
+            // changing the Z position with reference to Y. Made to create the effect of "depth" on the 2D scene
             float posZ = (transform.position.y / 100f) + defaultPositionZ;
             transform.position = new Vector3(transform.position.x, transform.position.y, posZ);
         }
     }
 
-    private void OnMouseDown() // если нажали на объект, то записываем позицию и разрешаем двигать
+    // if you click on an object, we record the position and allow it to move
+    private void OnMouseDown()
     {
         offset = transform.position - _camera.ScreenToWorldPoint(Input.mousePosition);
         isDrag = true;
     }
 
-    private void OnMouseUp()// убрали палец с объекта - закончили перемещение
+    // remove your finger from the object - finish moving
+    private void OnMouseUp()
     {
         isDrag = false;
 
-        // пускаем луч из точки тапа, чтобы проверить с чем объект пересекается.
-        // если объект над объектом, на который можно поставить, то оставляем его на этом же месте
+        /* we launch a ray from the tap point to check what the object intersects with.
+         * if the object is above the object on which we can place it, then we leave it in the same place */
 
         RaycastHit2D hit = Physics2D.Raycast(_camera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero,
             Mathf.Infinity, placeLayer);
 
-        if (!hit)// если нет, то отпускаем объект лететь вниз под действием физики, пока он не столкнется с объектом на который можно стать
+        // if not, then we let the object fly down under the influence of physics until it collides with an object that can be stood on
+        if (!hit)
         {
             _rb.isKinematic = false;
             isWaitCollision = true;
         }
     }
 
-    // проверяем столкновение с коллайдером места, на которое можно поставить объект.
-    // т.к. в настройках физики слой Movable взаимодействует только с Place, то можно не бояться, что она станет куда-то еще
+    // we check the collision with the collider of the place where the object can be placed. since in the physics settings the
+    // Movable layer interacts only with Place, then you can not be afraid that it will become somewhere else
     private void OnCollisionEnter2D(Collision2D collision)
     { 
         if (isWaitCollision)
         {
-            _rb.isKinematic = true;// делаем вновь кинематическим и сбрасываем скорости
+            // we make it kinematic again and reduce the speeds
+            _rb.isKinematic = true;
             _rb.velocity = Vector2.zero;
             _rb.angularVelocity = 0f;
 
