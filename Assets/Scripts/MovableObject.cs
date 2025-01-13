@@ -24,6 +24,7 @@ public class MovableObject : MonoBehaviour
         _camera = Camera.main;
         _rb = GetComponent<Rigidbody2D>();
 
+        _rb.freezeRotation = true;
         _rb.isKinematic = true;
     }
 
@@ -60,7 +61,7 @@ public class MovableObject : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (isWaitCollision && (1 << collision.gameObject.layer == placeLayer.value))
+        if (isWaitCollision)
         {
             _rb.isKinematic = true;
             _rb.velocity = Vector2.zero;

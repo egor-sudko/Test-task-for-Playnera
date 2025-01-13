@@ -1,14 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovableObjectsController : MonoBehaviour
 {
     [Header("Layers")]
     [SerializeField] private LayerMask placeLayer;
-
-    [Header("Movable Objects")]
-    [SerializeField] private List<MovableObject> movableObjectsList;
 
     private const float defaultConstZValue = -1f;
 
@@ -19,7 +14,9 @@ public class MovableObjectsController : MonoBehaviour
 
     private void InitializeMovableObjects()
     {
-        foreach (var movableObj in movableObjectsList)
+        MovableObject[] movableObjects = transform.GetComponentsInChildren<MovableObject>();
+
+        foreach (var movableObj in movableObjects)
         {
             movableObj.Initialize(placeLayer, defaultConstZValue);
         }
